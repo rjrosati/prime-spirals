@@ -11,7 +11,7 @@ The following types of spirals are currently supported:
 Additionally, random data with the same average density as the primes (scaled using the prime number theorem) can be plotted for comparison on each spiral type.
 
 #Usage
-    `spirals [image size] [spiral type]`
+    spirals [image size] [spiral type]
 
 `[spiral type]` must be one of the following strings: Sacks, Ulam, Vogel, RandomSacks, RandomUlam, RandomVogel.
 
@@ -23,4 +23,5 @@ Please feel free to fork, branch, enhance, or otherwise modify this code.
 Also feel free to contact me via my GitHub info with any comments, questions, or suggestions.
 
 Thanks,
+
 Robbie Rosati
