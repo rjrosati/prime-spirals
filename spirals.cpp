@@ -1,7 +1,7 @@
 // Creates an image of an Ulam spiral (http://en.wikipedia.org/wiki/Ulam_spiral)
 // or a Sacks spiral (http://www.numberspiral.com/)
 
-#include "lodepng.h"
+#include "lodepng/lodepng.h"
 #include <vector>
 #include <stdlib.h>
 #include <iostream>
@@ -14,9 +14,9 @@
 // makes a square. Don't want a square? Crop the image.
 
 // #define PRINT_PRIMES
-#define PRIME_COLOR_R  0x00
+#define PRIME_COLOR_R  0xFF
 #define PRIME_COLOR_G  0xFF
-#define PRIME_COLOR_B  0x00
+#define PRIME_COLOR_B  0xFF
 #define PRIME_COLOR_A  0xFF
 
 #define BG_COLOR_R  0x00
