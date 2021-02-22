@@ -28,9 +28,11 @@ typedef enum {
 	SACKS,
 	ULAM,
 	VOGEL,
+    TB1B,
 	RANDOM_SACKS,
 	RANDOM_ULAM,
-	RANDOM_VOGEL
+	RANDOM_VOGEL,
+	RANDOM_TB1B
 } spiral_t;
 
 
@@ -178,22 +180,63 @@ unsigned make_vogel(unsigned int size, std::vector<unsigned char>& img_spiral, s
 	return size_tmp;
 }
 
+// see https://www.youtube.com/watch?v=EK32jo7i5LQ
+// similar to Sacks and Vogel, but with
+// theta = i;
+// r = i;
+unsigned make_3b1b(unsigned int size, std::vector<unsigned char>& img_spiral, std::vector<unsigned char>& nums) {
+	unsigned int x, y;
+	unsigned int top_num = size*size;
+	double r, theta;
+	// probably need to resize the image
+	// circle with same area as a square with side length s needs a square with s' = 2/sqrt(pi) * s to contain it
+	unsigned size_tmp = size * 2 + 1;// but this is a very sparse circle. try 2x? (+1 to force odd) -- seems to work
+	std::cout << "Polar spirals require a bigger image to display all primes, resizing to " << size_tmp << std::endl;
+	img_spiral.resize(4 * size_tmp*size_tmp);
+	// init to black (same as composite #s)
+	for (unsigned int i = 0; i < size_tmp*size_tmp; i++) {
+		img_spiral[4 * i + 0] = BG_COLOR_R;
+		img_spiral[4 * i + 1] = BG_COLOR_G;
+		img_spiral[4 * i + 2] = BG_COLOR_B;
+		img_spiral[4 * i + 3] = BG_COLOR_A;
+	}
+
+	unsigned int cen = size_tmp / 2;
+	for (unsigned int i = 0; i < top_num; i++) {
+		r = 1.0*i*size/ top_num;
+		theta = r;
+		x = (unsigned)round(r* cos(theta)) + cen;
+		y = (unsigned)round(r*-sin(theta)) + cen;
+        std::cout<<x<<" "<<y<<std::endl;
+
+		if (nums[i]) {
+			img_spiral[4 * (y*size_tmp + x) + 0] = PRIME_COLOR_R;
+			img_spiral[4 * (y*size_tmp + x) + 1] = PRIME_COLOR_G;
+			img_spiral[4 * (y*size_tmp + x) + 2] = PRIME_COLOR_B;
+			img_spiral[4 * (y*size_tmp + x) + 3] = PRIME_COLOR_A;
+		} // else already black
+	}
+	return size_tmp;
+}
+
 
 
 int main(int argc, char** argv) {
     unsigned int size = 18000, outsize = size;
 	spiral_t spiral_type = RANDOM_ULAM;
-	const char *spiral_strings[] = { "a Sacks", "an Ulam", "a Vogel", "random junk in the shape of a Sacks", "random junk in the shape of an Ulam", "random junk in the shape of a Vogel" };
+	const char *spiral_strings[] = { "a Sacks", "an Ulam", "a Vogel", "a 3B1B", "random junk in the shape of a Sacks", "random junk in the shape of an Ulam", "random junk in the shape of a Vogel", "random junk in the shape of a 3B1B" };
 
 	if (argc >= 3) {
 		std::stringstream(argv[1]) >> size;
 		if (argv[2][0] == 'S') spiral_type = SACKS;
 		else if (argv[2][0] == 'U') spiral_type = ULAM;
 		else if (argv[2][0] == 'V') spiral_type = VOGEL;
+		else if (argv[2][0] == '3') spiral_type = TB1B;
 		else if (argv[2][0] == 'R') {
 			if (argv[2][6] == 'S') spiral_type = RANDOM_SACKS;
 			else if (argv[2][6] == 'U') spiral_type = RANDOM_ULAM;
 			else if (argv[2][6] == 'V') spiral_type = RANDOM_VOGEL;
+			else if (argv[2][6] == '3') spiral_type = RANDOM_TB1B;
 			else {
 				std::cout << "Unrecognized option: " << argv[2] << std::endl; exit(-1);
 			}
@@ -219,7 +262,7 @@ int main(int argc, char** argv) {
     }
     std::cout<<"Prime array initialized."<<std::endl;
 
-	if (spiral_type == SACKS || spiral_type == ULAM || spiral_type == VOGEL) {
+	if (spiral_type == SACKS || spiral_type == ULAM || spiral_type == VOGEL || spiral_type == TB1B) {
 		std::cout << "Sieving primes..." << std::endl;
 		// sieve of Eratosthenes
 		#ifdef PRINT_PRIMES
@@ -256,6 +299,10 @@ int main(int argc, char** argv) {
 	case SACKS:
 	case RANDOM_SACKS:
 		outsize = make_sacks(size, img_spiral, nums);
+		break;
+	case TB1B:
+	case RANDOM_TB1B:
+		outsize = make_3b1b(size, img_spiral, nums);
 		break;
 	case ULAM:
 	case RANDOM_ULAM:
